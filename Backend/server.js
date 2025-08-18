@@ -30,6 +30,12 @@ app.use(cors());
 app.use(helmet());
 app.use(errorHandler);
 
+
+app.use(cors({
+    origin: 'http://localhost:5173', // The origin of your frontend app
+    credentials: true
+}));
+
 app.get("/", (req, res) => {
   res.send("Api connected and running");
 });
