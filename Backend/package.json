@@ -1,7 +1,7 @@
 {
     "type": "module",
     "scripts": {
-        "start": "node server.js",
+        "start": "nodemon server.js",
         "dev": "nodemon server.js"
     },
     "dependencies": {
@@ -15,6 +15,7 @@
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.16.1",
         "morgan": "^1.10.0",
+        "nodemon": "^3.1.10",
         "redis": "^5.7.0",
         "swagger-ui-express": "^5.0.1",
         "winston": "^3.17.0",

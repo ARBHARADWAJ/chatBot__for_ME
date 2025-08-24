@@ -14,8 +14,8 @@ check("password", "Password must be at least 6 characters").isLength({ min:6}),
 
 
 router.post("/login",[
-check("name","Name is required").not().isEmpty(),
-check("passoword","Password is required").not().isEmpty(),
+check("email","email is required").not().isEmpty(),
+check("password","Password is required").not().isEmpty(),
 ],validateInput,loginUser);
 
 

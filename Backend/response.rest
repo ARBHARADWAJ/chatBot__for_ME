@@ -4,7 +4,7 @@ Content-Type: application/json
 {
   "name": "testuser2",
   "email": "ar@a3r.com",
-    "password": "t3estpassword"
+  "password": "t3estpassword"
 }
 
 POST http://localhost:3000/api/auth/login
@@ -16,12 +16,21 @@ Content-Type: application/json
 }
 
 
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "testtest"
+}
+
+
 
 GET http://localhost:3000/
 
 
 ### Register User
-POST http://localhost:3000/api/users/register
+POST http://localhost:3000/api/user/register
 Content-Type: application/json
 
 {

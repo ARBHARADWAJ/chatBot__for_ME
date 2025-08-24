@@ -3,38 +3,64 @@
 import React,{useState} from 'react';
 import Input from '../components/ui/Inputs';
 import Button from '../components/ui/Buttons';
+import api from '../services/api';
+import axios from 'axios';
 
 function RegisterPage() {
-    // 👇 Step 2: Create state variables to "remember" input values
-    const [fullName, setFullName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('testuser2');
+    const [email, setEmail] = useState('ar@a3r.com');
+    const [password, setPassword] = useState('t3estpassword');
+    const [error, setError] = useState(''); // 👈 State for displaying error messages
+    const [success, setSuccess] = useState(''); // 👈 State for displaying success messages
 
-    // 👇 Step 4: Create a function to handle form submission
-    const handleSubmit = (event) => {
-        // Prevents the default browser behavior of reloading the page on form submission
+    // We make the function 'async' to use 'await' for our API call
+    const handleSubmit = async (event) => {
+        // alert("started");
         event.preventDefault();
+        setError('');
+        setSuccess('');
 
-        // For now, we'll just log the data to the console
-        console.log("Form Submitted with data:", { fullName, email, password });
+        try {
+            const userData = { name:fullName, email:email, password:password };
+            // Use our api service to send a POST request to the /auth/register endpoint
+            const response = await api.post('/auth/register', userData);
+            // const sss=await axios.post('http://localhost:3000/api/auth/register', userData);
+        
+            console.log("Registration successful:", response);
+            setSuccess("Registration successful! You can now log in.");
+
+            // Clear the form fields after a successful registration
+            setFullName('');
+            setEmail('');
+            setPassword('');
+
+        } catch (apiError) {
+            // If the API returns an error, we'll capture it here
+            const errorMessage = apiError.response?.data?.message || "An error occurred. Please try again.";
+            console.error("Registration failed:", errorMessage.message);
+            setError(errorMessage);
+        }
     };
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
                 <h2 className="text-2xl font-bold text-center text-gray-800">
                     Sign up for an account
                 </h2>
+                {/* Display success or error messages */}
+                {success && <p className="text-green-600 text-center">{success}</p>}
+                {error && <p className="text-red-600 text-center">{error}</p>}
 
-                {/* 👇 Step 5: Connect the handler to the form's onSubmit event */}
                 <form className="space-y-6" onSubmit={handleSubmit}>
+                    {/* Input fields remain the same */}
                     <div>
-                        {/* 👇 Step 3: Connect state to the Input components */}
                         <Input
                             label="Full Name:"
                             type="text"
                             placeholder="Enter your full name"
                             value={fullName}
-                            onChange={(event) => setFullName(event.target.value)}
+                            onChange={(e) => setFullName(e.target.value)}
                         />
                     </div>
                     <div>
@@ -43,7 +69,7 @@ function RegisterPage() {
                             type="email"
                             placeholder="Enter your email"
                             value={email}
-                            onChange={(event) => setEmail(event.target.value)}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
                     <div>
@@ -52,11 +78,10 @@ function RegisterPage() {
                             type="password"
                             placeholder="Enter your password"
                             value={password}
-                            onChange={(event) => setPassword(event.target.value)}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
-
-                    <Button type="submit" className="w-full" value="create">
+                    <Button type="submit" className="w-full">
                         Create Account
                     </Button>
                 </form>
@@ -64,46 +89,5 @@ function RegisterPage() {
         </div>
     );
 }
-// function RegisterPage() {
-//     return (
-//         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-//             <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-//                 <h2 className="text-2xl font-bold text-center text-gray-800">
-//                     Sign up for an account
-//                 </h2>
-
-//                 <form className="space-y-6">
-//                     {/* Here we use our reusable Input component */}
-//                     <div>
-//                         <Input
-//                             label="Full Name:"
-//                             type="text"
-//                             placeholder="Enter your full name"
-//                         />
-//                     </div>
-//                     <div>
-//                         <Input
-//                             label="Email:"
-//                             type="email"
-//                             placeholder="Enter your email"
-//                         />
-//                     </div>
-//                     <div>
-//                         <Input
-//                             label="Password:"
-//                             type="password"
-//                             placeholder="Enter your password"
-//                         />
-//                     </div>
-
-//                     {/* And here we use our reusable Button component */}
-//                     <Button type="submit" className="w-full">
-//                         Create Account
-//                     </Button>
-//                 </form>
-//             </div>
-//         </div>
-//     );
-// }
 
 export default RegisterPage;

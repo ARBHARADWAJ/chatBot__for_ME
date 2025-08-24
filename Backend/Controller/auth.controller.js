@@ -6,7 +6,10 @@ import dotenv from "dotenv";
 
 
 export const registerUser = async (req, res) => {
+  console.log(req.body);
+  
   const { name, email, password } = req.body;
+  console.log("Registering user with data:", req.body);
   try {
     const userExisting = await User.findOne({ email });
     if (userExisting)
@@ -32,6 +35,8 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(email,password);
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
