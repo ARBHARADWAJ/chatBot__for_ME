@@ -1,16 +1,22 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
-import RegisterPage from './pages/RegisterPage'
-import LoginPage from './pages/LoginPage'
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoutes from "./components/ProtectedRoutes";
+import DashboardPage from "./pages/DashboardPge";
+import ChatPage from "./pages/ChatPage";
 
 const App = () => {
   return (
-<Routes>
-  <Route path='/' element={<h1 class="text-3xl font-bold underline">Welcome to the Home Page</h1>} />
-  <Route path='/register' element={<RegisterPage/>}/>
-  <Route path='/login' element={<LoginPage/>}/>
-</Routes>
-  )
-}
+    <Routes>
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoutes />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/chat" element={<ChatPage />} />
+      </Route>
+    </Routes>
+  );
+};
 
-export default App
+export default App;

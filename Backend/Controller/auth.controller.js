@@ -3,11 +3,9 @@ import bcrypt from "bcryptjs"; //for encryption
 import jwt from "jsonwebtoken"; //for token generation
 import dotenv from "dotenv";
 
-
-
 export const registerUser = async (req, res) => {
   console.log(req.body);
-  
+
   const { name, email, password } = req.body;
   console.log("Registering user with data:", req.body);
   try {
@@ -35,19 +33,24 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email,password);
-    
+    console.log(email, password);
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log(password, user.password, isPasswordValid);
+
     if (!isPasswordValid) {
+      console.log("invalid");
+
       return res.status(400).json({ message: "Invalid credentials" });
     }
     const token = jwt.sign({ id: user._id }, "process.env.JWT_SECRET", {
       expiresIn: "1h",
     });
+    console.log(token);
     return res.status(201).json({
       user: { id: user._id, name: user.name, email: user.email },
       token,
@@ -57,3 +60,9 @@ export const loginUser = async (req, res) => {
     return res.status(500).json({ message: "Login failed" });
   }
 };
+
+function logout(params) {
+  
+}
+
+

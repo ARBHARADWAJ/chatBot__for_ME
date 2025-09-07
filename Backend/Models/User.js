@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    previouschatname:{
+      type:String,
+    }
+    ,
+    
   },
   { timestamps: true }
 );
