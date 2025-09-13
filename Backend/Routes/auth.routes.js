@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, loginUser,logout } from "../Controller/auth.controller.js";
+import { registerUser, loginUser } from "../Controller/auth.controller.js";
 const router=express.Router();
 import { check } from "express-validator";
 import validateInput from "../Middleware/validate.middleware.js";
@@ -18,9 +18,8 @@ check("email","email is required").not().isEmpty(),
 check("password","Password is required").not().isEmpty(),
 ],validateInput,loginUser);
 
-router.get("/chat",)
 
 
-router.get("/logout",logout)
+
 
 export default router;

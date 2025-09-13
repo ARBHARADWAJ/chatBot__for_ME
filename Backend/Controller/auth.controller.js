@@ -2,6 +2,7 @@ import User from "../Models/User.js";
 import bcrypt from "bcryptjs"; //for encryption
 import jwt from "jsonwebtoken"; //for token generation
 import dotenv from "dotenv";
+dotenv.config();
 
 export const registerUser = async (req, res) => {
   console.log(req.body);
@@ -17,13 +18,12 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({ name, email, password: hashedPassword });
-    const token = jwt.sign({ id: user._id }, "process.env.JWT_SECRET", {
-      expiresIn: "1h",
-    });
+    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    //   expiresIn: "1h",
+    // });
 
     return res.status(201).json({
       user: { id: user._id, name: user.name, email: user.email },
-      token,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -40,29 +40,31 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log(password, user.password, isPasswordValid);
+    // console.log(password, user.password, isPasswordValid);
 
     if (!isPasswordValid) {
       console.log("invalid");
-
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    const token = jwt.sign({ id: user._id }, "process.env.JWT_SECRET", {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    console.log(token);
-    return res.status(201).json({
+    // console.log(token);
+    // const tokenoption = {
+    //   maxAge: 60000,
+    //   httpOnly: true,
+    //   secure: false,//
+    //   sameSite: "lax",
+    // };
+    // res.cookie("accessToken", token, tokenoption);
+    return res.status(200).json({
+      secure: true,
+      success: true,
+      token: token,
       user: { id: user._id, name: user.name, email: user.email },
-      token,
     });
   } catch (error) {
     console.error("Error in logging in user", error);
     return res.status(500).json({ message: "Login failed" });
   }
 };
-
-function logout(params) {
-  
-}
-
-
