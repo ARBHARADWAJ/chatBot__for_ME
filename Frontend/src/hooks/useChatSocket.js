@@ -26,8 +26,10 @@ export const useChatSocket = () => {
       setMessages([{ sender: "bot", text: "Hello! How can I assist you?" }]);
     });
 
-    socket.on("chat message", (incomingMsg) => {
+    socket.on("chat_message", (incomingMsg) => {
       // If incomingMsg is an object: { sender, text }
+      console.log("check 6");
+      
       const newMsg =
         typeof incomingMsg === "string"
           ? { sender: "bot", text: incomingMsg }
@@ -36,6 +38,10 @@ export const useChatSocket = () => {
     });
     socket.on("connect_error", (error) => {
       console.error("Connection failed:", error);
+    });
+
+    socket.on("load_messages", (loadedMessages) => {
+      setMessages(loadedMessages);
     });
 
     socket.on("disconnect", (reason) => {
@@ -50,6 +56,8 @@ export const useChatSocket = () => {
 
   // Function to send a message
   const sendMessage = (messageText) => {
+    console.log("check 2");
+
     if (!messageText.trim() || !socketRef.current) return;
 
     const userMessage = { sender: "user", text: messageText };
@@ -58,8 +66,16 @@ export const useChatSocket = () => {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     // Send the message to the server
-    socketRef.current.emit("chat message", messageText);
+    console.log(userMessage);
+
+    socketRef.current.emit("chat_message", userMessage);
   };
+
+  const createChatSession = (chatName) => {
+    if (!socketRef.current) return;
+    socketRef.current.emit("create new chat", { title: chatName });
+  };
+  const loadChatSessionMessages = (sessionId) => {};
 
   // Return the messages and the sendMessage function
   return { messages, sendMessage };

@@ -2,16 +2,16 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
-const ProtectedRoutes = () => {
+const ProtectedRoutes =  () => {
   const {
-    //   loading,
+      loading,
     isLoggedIn,
   } = useAuth();
   console.log("console.login", isLoggedIn);
 
-  // if(loading){
-  //   return <div>Loading...</div>;
-  // }
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!isLoggedIn) {
     return <Navigate to={"/login"} />;

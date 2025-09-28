@@ -2,6 +2,7 @@ import User from "../Models/User.js";
 import bcrypt from "bcryptjs"; //for encryption
 import jwt from "jsonwebtoken"; //for token generation
 import dotenv from "dotenv";
+import { chatSessionExport, chatMessagesExport } from "../Utils/ChatUtils.js";
 dotenv.config();
 
 export const registerUser = async (req, res) => {
@@ -49,14 +50,34 @@ export const loginUser = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    // console.log(token);
-    // const tokenoption = {
-    //   maxAge: 60000,
-    //   httpOnly: true,
-    //   secure: false,//
-    //   sameSite: "lax",
-    // };
-    // res.cookie("accessToken", token, tokenoption);
+    const sessions = await chatSessionExport(user._id);
+    console.log("session is imported");
+
+    return res.status(200).json({
+      secure: true,
+      success: true,
+      token: token,
+      sessions: sessions,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (error) {
+    console.error("Error in logging in user", error);
+    return res.status(500).json({ message: "Login failed" });
+  }
+};
+
+export const validateToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ message: "Token is not provided" });
+    }
+    const decode = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decode.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
     return res.status(200).json({
       secure: true,
       success: true,
@@ -64,7 +85,8 @@ export const loginUser = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email },
     });
   } catch (error) {
-    console.error("Error in logging in user", error);
-    return res.status(500).json({ message: "Login failed" });
+    return res
+      .status(500)
+      .json({ message: "Token validation failed", success: false });
   }
 };

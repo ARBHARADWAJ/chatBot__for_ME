@@ -14,17 +14,16 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      minlength: 5,
     },
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
     },
-    previouschatname:{
-      type:String,
-    }
-    ,
-    
+    previouschatname: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

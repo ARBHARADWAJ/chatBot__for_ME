@@ -8,10 +8,14 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: modelName });
 
 async function generateResponse(prompt) {
+  console.log("check 5");
+  
   if (!apiKey) {
     console.error("GOOGLE_API_KEY is not set in environment variables.");
     return "API key missing.";
   }
+  console.log("Generating response for prompt:", prompt);
+  
 
   try {
     const result = await model.generateContent(prompt);

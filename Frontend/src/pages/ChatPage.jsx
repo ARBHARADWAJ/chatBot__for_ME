@@ -7,9 +7,11 @@ import { useChatSocket } from '../hooks/useChatSocket'; // Import our new hook
 const ChatPage = () => {
     // Use our custom hook to get messages and the send function
     const { messages, sendMessage } = useChatSocket();
-    const [newMessage, setNewMessage] = useState("djsfjhdsbfjhbs2"+"\n"+"fjsdfbjsdbffdsdf");
+    const [newMessage, setNewMessage] = useState("");
 
     const handleSendMessage = (e) => {
+        console.log("check1");
+        
         e.preventDefault();
         sendMessage(newMessage); // Use the function from our hook
         setNewMessage("");

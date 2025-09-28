@@ -1,47 +1,50 @@
 // src/context/AuthContext.jsx
-import React, { useState, useContext, createContext } from "react";
+import React, { useState, useContext, createContext, useEffect } from "react";
 import api from "../services/api";
 
-// 1. Create the context
+
 const AuthContext = createContext();
 
-// 2. Create the Provider component
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // Initially, no user is logged in
-  // const [loading, setLoading] = useState(true); // To handle loading state during auth checks
-  // This function will be called from our LoginPage
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // We MUST have a loading state
+
+  useEffect(() => {
+    // This function runs only ONCE when the app loads
+    const validateUserSession = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const response = await api.post("/auth/validate-token", { token });
+        if (response.data.success) {
+          setUser(response.data.user);
+        }
+      } catch (error) {
+        localStorage.removeItem("accessToken");
+        setUser(null);
+      } finally {
+        setLoading(false); // Always stop loading after the check
+      }
+    };
+    validateUserSession();
+  }, []); // The empty array [] is crucial
+
   const login = (userData) => {
-    console.log("user data is set", userData);
-
     setUser(userData);
-    // setLoading(false);
   };
 
-  const logout = async () => {
-    try {
-      await api.post("/auth/logout");
-      setUser(null);
-      // setLoading(true);
-      alert("logged out successfully");
-    } catch (e) {
-      setUser(null);
-      console.error("Error during logout:", e);
-    }
-    // We would also clear tokens from storage here
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    setUser(null);
   };
 
-  const value = {
-    user,
-    isLoggedIn: !!user, // Double negation turns the user object into a boolean
-    // loading,
-    login,
-    logout,
-  };
-
+  const value = { user, isLoggedIn: !!user, loading, login, logout };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// 3. Create a custom hook to easily use the context
 export function useAuth() {
   return useContext(AuthContext);
 }
