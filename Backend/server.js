@@ -17,8 +17,11 @@ import jwt from "jsonwebtoken";
 import {
   createChatSession,
   handleChatMessages,
+  loadChatSessions,
+  loadChatMessages,
 } from "./Controller/chat.controller.js";
 import chatRoute from "./Routes/chat.Routes.js";
+// import { load } from "yamljs";
 
 dotenv.config();
 connectedDB();
@@ -65,6 +68,9 @@ app.use((err, req, res, next) => {
 });
 
 // Backend/server.js
+export const apikeyforgoogleapi = () => {
+  return process.env.GOOGLE_API_KEY;
+};
 
 io.use((socket, next) => {
   try {
@@ -74,6 +80,8 @@ io.use((socket, next) => {
       return next(new Error("Authentication error: No token provided"));
     }
     const secret = process.env.JWT_SECRET;
+    // console.log(secret, "here is it ");
+
     if (!secret) {
       console.error("Middleware FAIL: JWT_SECRET is not loaded in .env file!");
       return next(new Error("Server configuration error"));
@@ -132,12 +140,24 @@ io.on("connection", (socket) => {
   //   });
   // });
   socket.on("create_new_chat", (data) => createChatSession(socket, data));
-  socket.on("chat_message", (data) => {
-    console.log("cehck 3");
+  socket.on("chat message", (data) => {
     handleChatMessages(socket, data);
+  });
+  socket.on("load_sessions", (data) => {
+    loadChatSessions(socket, data);
+  });
+  socket.on("load_messages", (data) => {
+    loadChatMessages(socket, data);
   });
 });
 
 server.listen(3000, () => {
   console.log("server is running in port 3000");
 });
+
+
+// Chat session schema (for reference)
+// chatSessionId: {
+//   type: String, // <-- change from ObjectId to String
+//   required: true,
+// }

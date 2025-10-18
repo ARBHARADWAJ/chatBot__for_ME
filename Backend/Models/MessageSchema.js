@@ -1,21 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const messageSchema = new mongoose.Schema({
-    sender: {
-        type: String,
-        enum: ['user', 'bot'],
-        required: true,
+const messageSchema = new mongoose.Schema(
+  {
+    role: {
+      type: String,
+      enum: ["user", "bot"],
+      required: true,
     },
-    text: {
-        type: String,
-        required: true,
+    message: {
+      type: String,
+      required: true,
     },
     chatSessionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ChatSession', // Links this message to a specific conversation
-        required: true,
+      type: String, // Changed from ObjectId to String
+      required: true,
     },
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
-const Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.model("Message", messageSchema);
 export default Message;

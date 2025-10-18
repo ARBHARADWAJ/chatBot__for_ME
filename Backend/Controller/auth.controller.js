@@ -90,3 +90,13 @@ export const validateToken = async (req, res) => {
       .json({ message: "Token validation failed", success: false });
   }
 };
+
+export const DecodeUserId = async (token) => {
+  try {
+    const decode = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decode.id, "decoded id");
+    return decode.id;
+  } catch (error) {
+    return "";
+  }
+};

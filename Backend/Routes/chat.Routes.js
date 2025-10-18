@@ -25,8 +25,6 @@ router.post("/chats", async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve messages" });
   }
 });
-router.post("/messages", async (req, res) => {
-  
-});
+
 
 export default router;

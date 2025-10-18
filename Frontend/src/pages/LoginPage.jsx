@@ -22,6 +22,8 @@ function LoginPage() {
       console.log("Login successful:", response.data);
       // Later, we will save the token and redirect the user
       localStorage.setItem("accessToken", response.data.token);
+      console.log( "User data:", response.data.user);
+      
       login(response.data.user);
       navigate("/chat");
     } catch (apiError) {
