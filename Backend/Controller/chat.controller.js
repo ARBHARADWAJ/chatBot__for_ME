@@ -1,11 +1,14 @@
 import generateResponse from "../Utils/generateResponses.js";
-import ChatSession from "../Models/ChatSession.js";
 import Message from "../Models/MessageSchema.js";
 import { DecodeUserId } from "./auth.controller.js";
 import User from "../Models/User.js";
 import ChatSession from "../Models/ChatSession.js";
+import redisClient from "../Config/redis.js";
 
+const getSessionKey = (userId) => `session:${userId}`;
+const getMessagesKey = (sessionId) => `messages:${sessionId}`;
 //for /chat session loading
+
 export const load_ChatSessions_Login = async (req, res) => {
   try {
     const { token } = req.body;
@@ -38,9 +41,10 @@ export const createChatSession = async (socket, data) => {
       title: title || "new chat",
     });
     await newSession.save();
+    await redisClient.del(getSessionKey(socket.userId));
     // socket.emit("chat_created", { message: "sessoin created" });
     const sessions = await ChatSession.find({ userId: socket.userId });
-    console.log("Loaded chat sessions:", sessions);
+    // console.log("Loaded chat sessions:", sessions);
     socket.emit("load_sessions", sessions);
   } catch (error) {
     console.error("Error creating new chat session:", error);
@@ -50,10 +54,10 @@ export const createChatSession = async (socket, data) => {
 
 export const handleChatMessages = async (socket, data) => {
   try {
-    const { message, sessionid } = data;
+    const { message, mode, subdivision, sessionid } = data;
 
     if (!socket.userId) {
-      console.log("socket error");
+      // console.log("socket error");
       return socket.emit("error", { message: "Session ID is missing." });
     }
     const userMessage = new Message({
@@ -62,9 +66,15 @@ export const handleChatMessages = async (socket, data) => {
       chatSessionId: sessionid + "",
     });
     const ll = await userMessage.save();
-    console.log(ll);
+    // console.log(ll);
+    await redisClient.del(getMessagesKey(sessionid));
 
-    const airesponse = await generateResponse(sessionid, message);
+    const airesponse = await generateResponse(
+      sessionid,
+      message,
+      mode,
+      subdivision
+    );
     // console.log("AI Response:", airesponse);
 
     const botMessage = new Message({
@@ -75,7 +85,8 @@ export const handleChatMessages = async (socket, data) => {
 
     // console.log("Bot message to be saved:", botMessage);
     const l = await botMessage.save();
-    console.log(l);
+    // console.log(l);
+    await redisClient.del(getMessagesKey(sessionid));
 
     socket.emit("chat message", airesponse);
   } catch (error) {
@@ -90,7 +101,16 @@ export const loadChatSessions = async (socket, data) => {
     if (!token) {
       return socket.emit("error", { message: "User ID is missing." });
     }
+    const cacheKey = getSessionKey(socket.userId);
+
+    const cachedSessions = await redisClient.get(cacheKey);
+    if (cachedSessions) {
+      console.log("Sessions fetched from Redis Cache");
+      return socket.emit("load_sessions", JSON.parse(cachedSessions));
+    }
+
     const sessions = await ChatSession.find({ userId: socket.userId });
+    await redisClient.set(cacheKey, JSON.stringify(sessions), { EX: 3600 }); //cache for 1 hour
     // console.log("Loaded chat sessions:", sessions);
     socket.emit("load_sessions", sessions);
   } catch (error) {
@@ -101,11 +121,22 @@ export const loadChatSessions = async (socket, data) => {
 export const loadChatMessages = async (socket, data) => {
   try {
     const { sessionId } = data;
-
     if (!sessionId) {
       return socket.emit("error", { message: "Session ID is missing." });
     }
+    const cacheKey = getMessagesKey(sessionId);
+    const cachedMessages = await redisClient.get(cacheKey);
+    if (cachedMessages) {
+      console.log("Messages fetched from Redis Cache");
+      return socket.emit("load_messages", {
+        messages: JSON.parse(cachedMessages),
+        sessionId: sessionId,
+      });
+    }
+
     const messages = await Message.find({ chatSessionId: sessionId });
+    await redisClient.set(cacheKey, JSON.stringify(messages), { EX: 3600 });
+
     // console.log("Loaded chat messages:", { messages: messages, sessionId: sessionId });
     socket.emit("load_messages", { messages: messages, sessionId: sessionId });
   } catch (error) {

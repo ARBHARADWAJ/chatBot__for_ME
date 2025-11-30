@@ -2,10 +2,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import Input from "../components/ui/Inputs";
 import Buttons from "../components/ui/Buttons";
+import ChatInput from "../components/ui/ChatInput";
+import { useAuth } from "../context/AuthContext";
+
 import { useChatSocket } from "../hooks/useChatSocket";
 import ReactMarkdown from "react-markdown";
-
 const ChatPage = () => {
+  const { logout } = useAuth();
   const {
     messages,
     sessions,
@@ -19,6 +22,57 @@ const ChatPage = () => {
 
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
+  const [mode, setMode] = useState("");
+  const [subdivision, setSubdivision] = useState("");
+
+  // --- MOCK DATA FOR DROPDOWNS ---
+  const modeOptions = [
+    { label: "General Chat", value: "general" },
+    { label: "Code Help", value: "code" },
+    { label: "Essay Writing", value: "essay" },
+    { label: "Email Assistance", value: "mail" },
+  ];
+
+  const subdivisionOptions = [
+    { label: "Friendly Tone", value: "friendly" },
+    { label: "Professional Tone", value: "professional" },
+    { label: "Sarcastic Tone", value: "sarcastic" },
+  ];
+
+  const subCodeDivisionOptions = [
+    { label: "Code Analysis", value: "explain" },
+    { label: "Debugging", value: "debug" },
+    { label: "Code Generation", value: "generate" },
+    { label: "Code Opinion", value: "opinion" },
+    { label: "Code Refactor", value: "refactor" },
+    {label:"Coding MCQ Assignment", value:"assignment" },
+  ];
+  const subEssayDivisionOptions = [
+    { label: "Friendly Tone", value: "friendly" },
+    { label: "Professional Tone", value: "professional" },
+    { label: "Sarcastic Tone", value: "sarcastic" },
+  ];
+  const subMailDivisionOptions = [
+    { label: "Casual Tone", value: "casual" },
+    { label: "Professional Tone", value: "professional" },
+    { label: "Urgent Tone", value: "urgent" },
+    { label: "Cover Letter", value: "cover_letter" },
+  ];
+
+  function handleSubDivisions() {
+  switch (mode) {
+    case "general":
+      return subdivisionOptions;
+    case "code":
+      return subCodeDivisionOptions;
+    case "essay":
+      return subEssayDivisionOptions;
+    case "mail":
+      return subMailDivisionOptions;
+    default:
+      return subdivisionOptions; // fallback to general
+  }
+}
 
   // State for the "New Chat" modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,8 +81,11 @@ const ChatPage = () => {
   //TODO: for the list of rules made from user need to do the list optimisible and user accissble and crud th erules
 
   const handleSendMessage = (e) => {
-    e.preventDefault();
-    sendMessage(newMessage);
+    // e.preventDefault();
+    // alert(mode)
+    // alert(subdivision)
+  
+    sendMessage(newMessage, mode, subdivision);
     setLoading(true);
     setNewMessage("");
   };
@@ -115,7 +172,7 @@ const ChatPage = () => {
 
       {/* --- MAIN CHAT AREA --- */}
       <div className="flex flex-col flex-1">
-        <header className="p-4 bg-white border-b shadow-sm flex items-center justify-between">
+        {/* <header className="p-4 bg-white border-b shadow-sm flex items-center justify-between">
           <h1 className="text-base font-semibold ml-1">AI Assistant Chat</h1>
           <p
             onClick={() => setIsRulesOpen(!isRulesOpen)}
@@ -142,7 +199,52 @@ const ChatPage = () => {
               </ul>
             </div>
           )}
-        </header>
+        </header> */}
+        <header className="p-4 bg-white border-b shadow-sm flex items-center justify-between">
+  <h1 className="text-base font-semibold ml-1">AI Assistant Chat</h1>
+
+  {/* --- Right Side Container (Rules + Logout) --- */}
+  <div className="flex items-center gap-4">
+    
+    {/* --- Rules Section (Relative Parent) --- */}
+    <div className="relative">
+      <p
+        onClick={() => setIsRulesOpen(!isRulesOpen)}
+        className="cursor-pointer text-gray-500 hover:text-gray-900 transition-colors select-none"
+      >
+        View Rules 📜
+      </p>
+
+      {/* Dropdown Menu */}
+      {isRulesOpen && (
+        <div className="absolute right-0 mt-2 w-72 bg-white border rounded-lg shadow-xl z-20">
+          <ul className="p-1 space-y-1 text-sm text-gray-700">
+            <li className="px-3 py-2 border-b bg-gray-50 rounded-t-lg">
+              <strong>Your Chat Rules:</strong>
+            </li>
+            <li className="px-3 py-2 hover:bg-gray-100 cursor-default">
+              1. Keep tone friendly.
+            </li>
+            <li className="px-3 py-2 hover:bg-gray-100 cursor-default">
+              2. No personal info.
+            </li>
+            <li className="px-3 py-2 hover:bg-gray-100 cursor-default rounded-b-lg">
+              3. AI may make mistakes.
+            </li>
+          </ul>
+        </div>
+      )}
+    </div>
+
+    {/* --- Logout Button --- */}
+    <button
+      onClick={logout} // Assumes you pulled { logout } from useAuth() at the top
+      className="px-4 py-1.5 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md shadow-sm transition-colors"
+    >
+      Logout
+    </button>
+  </div>
+</header>
 
         <main className="flex-1 p-6 overflow-y-auto">
           {!activeSessionId ? (
@@ -208,12 +310,12 @@ const ChatPage = () => {
           )}
         </main>
 
-        <footer className="p-4 bg-white border-t">
+        <footer className="p-4  bg-white border-t">
           <form
             onSubmit={handleSendMessage}
             className="flex items-center space-x-3"
           >
-            <Input
+            {/* <Input
               type="text"
               placeholder={
                 !activeSessionId
@@ -225,10 +327,34 @@ const ChatPage = () => {
               className="flex-1"
               autoComplete="off"
               disabled={!activeSessionId} // Disable if no chat is active
-            />
-            <Buttons type="submit" disabled={!activeSessionId}>
-              Send
-            </Buttons>
+            /> */}
+            {/* Here is your new ChatInput component */}
+            <div className="w-[90%]">
+              <ChatInput
+                placeholder={
+                  !activeSessionId
+                    ? "Select a chat to start"
+                    : "Type your message... (Shift + Enter for new line)"
+                }
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onSubmit={handleSendMessage} // Pass the submit handler
+                disabled={!activeSessionId}
+                // Pass down the props for Dropdown 1
+                mode={mode}
+                onModeChange={(e) => setMode(e.target.value)}
+                modeOptions={modeOptions}
+                // Pass down the props for Dropdown 2
+                subdivision={subdivision}
+                onSubdivisionChange={(e) => setSubdivision(e.target.value)}
+                subdivisionOptions={handleSubDivisions()}
+              />
+            </div>
+            <div className="w-[10%]">
+              <Buttons type="submit" disabled={!activeSessionId}>
+                Send
+              </Buttons>
+            </div>
           </form>
         </footer>
       </div>

@@ -1,1 +1,2 @@
-@import "tailwindcss";
+/* App-specific stylesheet. Tailwind is imported/processed from `src/style.css` (imported by `src/main.jsx`).
+	Removed direct `@import "tailwindcss"` to avoid duplicate or conflicting imports. */

@@ -25,7 +25,7 @@ export const useChatSocket = () => {
     const socket = socketRef.current;
 
     socket.on("connect", () => {
-      console.log("Connected to WebSocket server:", socket.id);
+      // console.log("Connected to WebSocket server:", socket.id);
       socketRef.current.emit("load_sessions", { token: token });
     });
 
@@ -49,8 +49,8 @@ export const useChatSocket = () => {
       //  alert("no messages found");
         setMessages([{ role: "bot", message: "Hello! How can I assist you?" }]);
       // }
-      console.log("loaded messages", messages, sessionId);
-      console.log("active session id set t--o", activeSessionId);
+      // console.log("loaded messages", messages, sessionId);
+      // console.log("active session id set t--o", activeSessionId);
 
       setMessages(messages);
     });
@@ -96,12 +96,12 @@ export const useChatSocket = () => {
     // Add user's message to the UI immediately
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     // Send the message to the server
-    console.log(userMessage);
+    // console.log(userMessage);
     socketRef.current.emit("chat message", userMessage);
   };
 
   const createChatSession = (chatName) => {
-    console.log("new chat name in hook", chatName);
+    // console.log("new chat name in hook", chatName);
     if (!socketRef.current) return;
     socketRef.current.emit("create_new_chat", { title: chatName });
   };

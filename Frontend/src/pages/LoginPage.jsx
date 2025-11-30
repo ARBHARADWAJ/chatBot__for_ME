@@ -6,23 +6,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
-  const [email, setEmail] = useState("ravisankar@mail.com");
-  const [password, setPassword] = useState("ravisankar");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+  //ravisankar@mail.com
+  //ravisankar
+
 
   const handleLogin = async (event) => {
     event.preventDefault();
     setError("");
-    console.log(email, password);
+    // console.log(email, password);
 
     try {
       const response = await api.post("/auth/login", { email, password });
-      console.log("Login successful:", response.data);
+      // console.log("Login successful:", response.data);
       // Later, we will save the token and redirect the user
       localStorage.setItem("accessToken", response.data.token);
-      console.log( "User data:", response.data.user);
+      // console.log( "User data:", response.data.user);
       
       login(response.data.user);
       navigate("/chat");

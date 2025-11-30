@@ -7,7 +7,7 @@ const ProtectedRoutes =  () => {
       loading,
     isLoggedIn,
   } = useAuth();
-  console.log("console.login", isLoggedIn);
+  // console.log("consoele.login", isLoggedIn);
 
   if (loading) {
     return <div>Loading...</div>;

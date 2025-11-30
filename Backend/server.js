@@ -21,10 +21,13 @@ import {
   loadChatMessages,
 } from "./Controller/chat.controller.js";
 import chatRoute from "./Routes/chat.Routes.js";
+import { connectRedis } from "./Config/redis.js";
+
 // import { load } from "yamljs";
 
 dotenv.config();
 connectedDB();
+connectRedis();
 
 const app = express();
 

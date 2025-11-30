@@ -5,6 +5,7 @@ import Input from "../components/ui/Inputs";
 import Button from "../components/ui/Buttons";
 import api from "../services/api";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -26,7 +27,7 @@ function RegisterPage() {
       const response = await api.post("/auth/register", userData);
       // const sss=await axios.post('http://localhost:3000/api/auth/register', userData);
 
-      console.log("Registration successful:", response);
+      // console.log("Registration successful:", response);
       setSuccess("Registration successful! You can now log in.");
 
       // Clear the form fields after a successful registration

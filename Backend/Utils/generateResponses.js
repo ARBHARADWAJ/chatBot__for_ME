@@ -1,119 +1,90 @@
-import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { exportMessages, exportNoOfMessages } from "../Utils/ChatUtils.js";
 import { apikeyforgoogleapi } from "../server.js";
+import { modified_Message } from "./PromtpUtils.js"; 
 
-const modelName = "gemini-2.5-flash";
+const modelName = "gemini-2.0-flash";
 
-
-async function generateResponse(sessionId, text) {
-  console.log("came to this function");
-
-  const apiKey = apikeyforgoogleapi();
-  if (!apiKey) {
-    console.error("GOOGLE_API_KEY is not set in environment variables.");
-    return "API key missing.";
-  }
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    systemInstruction: `You are an assistant that answers concisely and helpfully.
+const BASE_SYSTEM_INSTRUCTION = `You are an assistant that answers concisely and helpfully.
 - Tone: friendly, simple language, avoid jargon.
-- Length: aim for <= 100 words. If asked for details, provide a short summary (<=100 words) and offer to expand.
-- Clarity: prefer short sentences and examples.
-- Context: always consider the recent conversation history and the latest user message. If user asks about recent/updated data, prefer the newest information in history.
-- Format: return plain text. If the user asks for structured output, return valid JSON with keys: { answer: string, citations?: string[] }.
-- Do not invent facts. If unsure, say "I don't know" and/or provide steps to find out.`,
-  });
+- Length:  aim for <= 100 words if user not requested any thing,if he specified ,otherwise air for >100 words.
+- Context: always consider the recent conversation history.
+- Format: return plain text unless JSON is requested then provide with valid format so that the front end can fetch and give beautifully to the user.
+- Do not invent facts.
+-Always keep it in consideration that these are responses are for Indians, for this project ,so kindly provide with neat answers in indian tone and details.
+-If the context is large topic ,take some time to fetch all the data and provide a detailed answer.waiting is some times good.`
+;
+
+async function generateResponse(sessionId, text, mode, subdivision) {
+  const apiKey = apikeyforgoogleapi();
+  if (!apiKey) return "API key missing.";
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+console.log(text,mode,subdivision);
 
   try {
+    // 1. Fetch History (THE MEMORY)
     let noOfMessages = await exportNoOfMessages(sessionId);
-    let messages = [];
+    const MAX_HISTORY = 15;
+    const messagesToFetch = Math.min(noOfMessages, MAX_HISTORY) || 1;
+    
+    // Fetch raw messages from DB
+    let messages = await exportMessages(sessionId, messagesToFetch);
 
-    if (noOfMessages > 15) {
-      noOfMessages = 15;
-    }
-    // Fetch the old messages
-    messages = await exportMessages(sessionId, noOfMessages ?? 1);
-
-    // Format the old messages from the database
-    const formattedHistory = messages.map((msg) => ({
+    // 2. Format History (CRITICAL FOR MEMORY)
+    // The API requires this exact structure: { role: string, parts: [{ text: string }] }
+    let formattedHistory = messages.map((msg) => ({
       role: msg.role.toLowerCase() === "user" ? "user" : "model",
-      parts: [{ text: msg.message }],
+      parts: [{ text: typeof msg.message === "string" ? msg.message : String(msg.message) }],
     }));
+    formattedHistory = formattedHistory.reverse(); // Ensure chronological order
+    // 3. Generate the Custom Instructions (Mode & Subdivision)
+    const specificInstruction = modified_Message(text, mode, subdivision);
 
-    // ✅ FIX: Create a correctly formatted object for the NEW message that was just sent
+    // 4. Combine Base + Specific Instructions
+    const finalSystemInstruction = specificInstruction + "\n" + BASE_SYSTEM_INSTRUCTION;
+    // console.log(finalSystemInstruction);
+    
+    // 5. Initialize Model
+    // ✅ FIX: Use 'finalSystemInstruction' here. You were using 'BASE_SYSTEM_INSTRUCTION' before.
+    const model = genAI.getGenerativeModel({
+      model: modelName,
+      systemInstruction: finalSystemInstruction, 
+    });
+
+    // 6. Create the New User Message
+    // This is just the raw text. The AI will look at 'formattedHistory' for context
+    // and 'finalSystemInstruction' for how to behave.
     const newUserMessage = {
       role: "user",
-      parts: [{ text: text }], // Use the 'text' parameter here
+      parts: [{ text: text }], 
     };
+    // console.log(newUserMessage);
+  
 
-    // ✅ FIX: Combine the old history and the new message into one array
+    // 7. Merge History + New Message
     const fullContent = [...formattedHistory, newUserMessage];
+    //to log all the fullcontent array
+    
+    // console.log(fullContent.map(item => item.parts.map(part => part.text).join(' ')).join('\n---\n'));
+    // Debugging: Ensure memory is being sent
+    // console.log(`Sending ${formattedHistory.length} past messages as memory.`);
 
-    // Send the complete conversation history to the AI
     const result = await model.generateContent({ contents: fullContent });
-    const response = result.response;
-    const responseText = response.text(); // Renamed to avoid conflict with the 'text' parameter
-    return responseText;
+    const rawText = result.response.text();
+
+    try {
+      const jsonResponse = JSON.parse(rawText);
+      if (jsonResponse && jsonResponse.answer) return jsonResponse.answer;
+      return rawText;
+    } catch (e) {
+      return rawText;
+    }
+
   } catch (error) {
     console.error("AI Error:", error.message);
-    return "An error occurred while generating the response.";
+    return "An error occurred.";
   }
 }
-// generateResponse("Hello, how are you?").then((res) => console.log(res));
 
 export default generateResponse;
-
-
-
-// async function generateResponse(sessionId, text) {
-//   console.log("came to this function");
-
-//   const apiKey = "AIzaSyDn8U1ZS70eUdj7vUgo3qqFnCfmUqTmM5E";
-//   console.log("API KEY:", apiKey); // Debug: print API key
-//   if (!apiKey) {
-//     console.error("GOOGLE_API_KEY is not set in environment variables.");
-//     return "API key missing.";
-//   }
-//   const genAI = new GoogleGenerativeAI(apiKey);
-//   const model = genAI.getGenerativeModel({ model: modelName });
-
-//   try {
-//     let noOfMessages = await exportNoOfMessages(sessionId);
-//     if (noOfMessages > 15) {
-//       noOfMessages = 15;
-//     }
-
-//     // 1. Fetch the message history (already in chronological order from exportMessages)
-//     const messageHistory = await exportMessages(sessionId, noOfMessages);
-
-//     // If there's no history, we can't generate a response based on it.
-//     if (messageHistory.length === 0) {
-//       return "I'm ready to chat! What's on your mind?";
-//     }
-
-//     // 2. ✅ FIX: The last message in the array is the user's NEW prompt.
-//     // We separate it from the rest of the history.
-//     const lastMessage = messageHistory.pop();
-
-//     // 3. ✅ FIX: Format the OLD messages for the chat history.
-//     const historyForAI = messageHistory.map((msg) => ({
-//       role: msg.role.toLowerCase() === "user" ? "user" : "model",
-//       parts: [{ text: msg.message }],
-//     }));
-
-//     // 4. ✅ FIX: Use the `startChat` method, which is built for conversations.
-//     const chat = model.startChat({
-//       history: historyForAI,
-//     });
-
-//     // 5. ✅ FIX: Send only the new message's text to get a response.
-//     const result = await chat.sendMessage(lastMessage.message);
-//     const response = result.response;
-//     return response.text(); // return "this is the text"
-//   } catch (error) {
-//     console.error("AI Error:", error.message);
-//     return "An error occurred while generating the response.";
-//   }
-// }
