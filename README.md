@@ -3,14 +3,6 @@
   > A local-first, full-stack application designed to help you explore, understand, and build the next generation of AI-powered conversational
   experiences.
 
-  !React (https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)
-  
-  !NodeJS (https://img.shields.io/badge/node.js-6DA55F?style=flat&logo=node.js&logoColor=white)
-  
-  !MongoDB (https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=flat&logo=mongodb&logoColor=white)
-  
-  !Docker (https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
-
 
   This project is more than just a chatbot. It's a complete, self-contained universe designed for one purpose: to be run, explored, and understood on
   your local machine. It serves as a hands-on guide through the architecture of a modern, full-stack AI application. Every line of code, every service,
@@ -45,26 +37,13 @@
   This application is a complete ecosystem, with each component chosen to demonstrate modern development practices.
 
 
-  ┌─────────────┬───────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ─┐
-  │ Component   │ Technology            │ Role & Purpose
-  │
-  ├─────────────┼───────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ─┤
-  │ Frontend    │ **React (Vite) + Tai... │ The beautiful, responsive face of our application. It handles user interaction and communicates in
-  real-ti... │
-  │ **Backend ... │ Node.js + Express.js  │ The brain of the operation. It manages user authentication, orchestrates API calls to the Gemini model,
-  an... │
-  │ **Primary ... │ MongoDB               │ Our long-term memory. A flexible NoSQL database used to store user credentials, chat sessions, and
-  message... │
-  │ **Caching ... │ Redis                 │ The short-term memory. An incredibly fast in-memory database used for caching frequently accessed data
-  and... │
-  │ **AI Intel... │ **Google Gemini API ... │ The spark of genius. This is the Generative AI service that provides the intelligence for our chatbot's
-  re... │
-  │ Development │ **Docker Compose + C... │ Our development toolkit. Docker provides a clean, isolated environment for our databases. Concurrently
-  all... │
-  └─────────────┴───────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ─┘
+  
+  **Frontend ...  React (Vite) + Tai... - The beautiful, responsive face of our application. It handles user interaction and communicates in real-ti... 
+  **Backend ...  Node.js + Express.js  - The brain of the operation. It manages user authentication, orchestrates API calls to the Gemini model, an... 
+  **Primary ...  MongoDB               - Our long-term memory. A flexible NoSQL database used to store user credentials, chat sessions, and message... 
+  **Caching ...  Redis     - The short-term memory. An incredibly fast in-memory database used for caching frequently accessed data and... 
+  **AI Intel... Google Gemini API ... - The spark of genius. This is the Generative AI service that provides the intelligence for our chatbot's re...  
+  **Docker Compose + C... - Our development toolkit. Docker provides a clean, isolated environment for our databases. Concurrently all... 
 
 
   🚀 Getting Started: Your Local Development Guide
