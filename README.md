@@ -1,5 +1,3 @@
-Here is the summary of the application, just as you asked for.
-
 ### **A Quick Introduction**
 
 This application is a smart, modern AI chatbot built for you. It’s designed to have natural, flowing conversations, moving far beyond the simple chatbots we are used to.
