@@ -33,11 +33,16 @@ const app = express();
 
 const server = http.createServer(app);
 
-const allowedOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
+const PORT = process.env.PORT || 3000;
+
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter((origin) => origin !== "");
 // NEW: Create a new Socket.IO server and attach it to our HTTP server.
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins, // Your frontend URL
+    origin: allowedOrigins.length > 0 ? allowedOrigins : ["http://localhost:5173", "http://127.0.0.1:5173"], // Your frontend URL
     methods: ["GET", "POST"],
     credentials: true,
     cookie: true,
@@ -51,7 +56,7 @@ app.use(errorHandler);
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: allowedOrigins.length > 0 ? allowedOrigins : ["http://localhost:5173", "http://127.0.0.1:5173"],
   credentials: true,
 };
 
@@ -154,9 +159,10 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("server is running in port 3000");
+server.listen(PORT, () => {
+  console.log(`server is running in port ${PORT}`);
 });
+
 
 
 // Chat session schema (for reference)

@@ -201,7 +201,7 @@ const ChatPage = () => {
           )}
         </header> */}
         <header className="p-4 bg-white border-b shadow-sm flex items-center justify-between">
-  <h1 className="text-base font-semibold ml-1">AI Assistant Chat</h1>
+  <h1 className="text-base font-semibold ml-1">COGNIFLOW</h1>
 
   {/* --- Right Side Container (Rules + Logout) --- */}
   <div className="flex items-center gap-4">

@@ -19,7 +19,8 @@ pids
 lib-cov
 
 # Ignore MongoDB data folder
-Config/mongodb/db_data/
+Config/mongodb/
+Config/redis/
 
 # Coverage directory used by tools like istanbul
 coverage

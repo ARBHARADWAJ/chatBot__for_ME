@@ -1,14 +1,16 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const connectDB = async () => {
   try {
-    const test = "test";
     const conn = await mongoose.connect(
-      "mongodb://root:example@localhost:27017/",
+      process.env.MONGO_URI,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        dbName:"test"
+        dbName: process.env.MONGO_DB_NAME
       }
     );
 

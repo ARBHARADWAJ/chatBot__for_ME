@@ -4,12 +4,12 @@ import { User } from "../models/user.model.js";
 const Protect = async (req, res, next) => {
   let token;
   if (
-    req.header.authorization &&
-    req.header.authorization.startsWith("Bearer")
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
   ) {
     try {
-      token = req.header.authorization.split(" ")[1];
-      console.log(req.header.authorization.split(" "));
+      token = req.headers.authorization.split(" ")[1];
+      console.log(req.headers.authorization.split(" "));
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select("-password");

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_SERVER_URL = "http://localhost:3000"; // Define the server URL here
+const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_SERVER_URL || "http://localhost:3000"; // Define the server URL here
 
 export const useChatSocket = () => {
   // State to hold the messages

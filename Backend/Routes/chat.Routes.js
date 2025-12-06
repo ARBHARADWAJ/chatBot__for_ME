@@ -2,6 +2,8 @@ import express from "express";
 const router = express.Router();
 import User from "../Models/User.js";
 import Message from "../Models/MessageSchema.js";
+import jwt from "jsonwebtoken";
+import ChatSession from "../Models/ChatSession.js";
 
 
 router.post("/chats", async (req, res) => {
@@ -16,7 +18,7 @@ router.post("/chats", async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const session = await chatSession
+    const session = await ChatSession
       .find({ userId: user._id })
       .sort({ updatedAt: -1 });
 

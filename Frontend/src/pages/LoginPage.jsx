@@ -11,9 +11,6 @@ function LoginPage() {
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
-  //ravisankar@mail.com
-  //ravisankar
-
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -26,7 +23,7 @@ function LoginPage() {
       // Later, we will save the token and redirect the user
       localStorage.setItem("accessToken", response.data.token);
       // console.log( "User data:", response.data.user);
-      
+
       login(response.data.user);
       navigate("/chat");
     } catch (apiError) {
