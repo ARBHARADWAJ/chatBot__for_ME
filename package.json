@@ -2,7 +2,7 @@
   "name": "cogniflow-master",
   "version": "1.0.0",
   "description": "Master script to run the full stack AI application",
-   "scripts": {
+  "scripts": {
     "install:all": "npm install && cd Backend && npm install && cd ../Frontend && npm install",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",

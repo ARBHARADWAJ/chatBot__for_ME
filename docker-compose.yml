@@ -1,6 +1,45 @@
 version: '3.8'
 
 services:
+  # --- Frontend Service ---
+  frontend:
+    build: ./Frontend
+    container_name: frontend-app
+    ports:
+      - "5173:80" # Map host port 5173 to container port 80 (Nginx)
+    depends_on:
+      - backend
+    restart: always
+
+  # --- Backend Service ---
+  backend:
+    build: ./Backend
+    container_name: backend-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # These values should ideally come from a .env file that is not committed to git
+      GOOGLE_API_KEY: YOUR_GOOGLE_API_KEY_HERE
+      JWT_SECRET: YOUR_JWT_SECRET_HERE
+      PORT: 3000
+      # Use the service names as hostnames, Docker's internal DNS will resolve them
+      MONGO_URI: mongodb://root:example@mongo:27017/
+      MONGO_DB_NAME: test
+      CORS_ORIGIN: http://localhost:5173
+      # Use the service name 'redis' for the Redis connection
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      # Mount the backend source code for development (optional, but good for seeing changes)
+      # For production, you would remove this volume mount
+      - ./Backend:/app
+      # Add a volume for node_modules to prevent the host's node_modules from overwriting the container's
+      - /app/node_modules
+
+
   # --- MongoDB Service ---
   mongo:
     image: mongo
@@ -12,7 +51,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
-      # Using a bind mount as per your snippet (saves data to a local folder ./db_data)
+      # Using a bind mount to persist database data on the host machine
       - ./db_data/:/data/db/
 
   # --- Redis Service ---
