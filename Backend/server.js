@@ -1,4 +1,7 @@
 //Jai shree Ram
+import dotenv from "dotenv";
+dotenv.config(); // MUST be first before any env vars are used
+
 // const express=require("express");
 import express from "express";
 // const connectedDB = require("./Config/db").default;
@@ -11,7 +14,6 @@ import { errorHandler } from "./Middleware/error.middleware.js";
 import http from "http";
 import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 import generateResponse from "./Utils/generateResponses.js";
 import jwt from "jsonwebtoken";
 import {
@@ -25,7 +27,7 @@ import { connectRedis } from "./Config/redis.js";
 
 // import { load } from "yamljs";
 
-dotenv.config();
+// dotenv.config() already called at top of file
 connectedDB();
 connectRedis();
 
@@ -42,10 +44,12 @@ const allowedOrigins = (process.env.CORS_ORIGIN || "")
 // NEW: Create a new Socket.IO server and attach it to our HTTP server.
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins.length > 0 ? allowedOrigins : ["http://localhost:5173", "http://127.0.0.1:5173"], // Your frontend URL
+    origin:
+      allowedOrigins.length > 0
+        ? allowedOrigins
+        : ["http://localhost:5173", "http://127.0.0.1:5173"], // Your frontend URL
     methods: ["GET", "POST"],
     credentials: true,
-    cookie: true,
   },
 });
 
@@ -56,7 +60,10 @@ app.use(errorHandler);
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: allowedOrigins.length > 0 ? allowedOrigins : ["http://localhost:5173", "http://127.0.0.1:5173"],
+  origin:
+    allowedOrigins.length > 0
+      ? allowedOrigins
+      : ["http://localhost:5173", "http://127.0.0.1:5173"],
   credentials: true,
 };
 
@@ -162,8 +169,6 @@ io.on("connection", (socket) => {
 server.listen(PORT, () => {
   console.log(`server is running in port ${PORT}`);
 });
-
-
 
 // Chat session schema (for reference)
 // chatSessionId: {

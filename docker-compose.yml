@@ -20,13 +20,13 @@ services:
       - "3000:3000"
     environment:
       # These values should ideally come from a .env file that is not committed to git
-      GOOGLE_API_KEY: YOUR_GOOGLE_API_KEY_HERE
-      JWT_SECRET: YOUR_JWT_SECRET_HERE
+      GOOGLE_API_KEY: "<GOOGLE_API_KEY>"
+      JWT_SECRET: "<YOUR_JWT_SECRET>"
       PORT: 3000
       # Use the service names as hostnames, Docker's internal DNS will resolve them
-      MONGO_URI: mongodb://root:example@mongo:27017/
+      MONGO_URI: mongodb://root:example@mongo:27017/?authSource=admin
       MONGO_DB_NAME: test
-      CORS_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:5173,http://127.0.0.1:5173
       # Use the service name 'redis' for the Redis connection
       REDIS_URL: redis://redis:6379
     depends_on:
